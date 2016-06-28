@@ -1,0 +1,17 @@
+Files Metrics
+
+********************Maximun Lenght********************
+Bacteria: 14,782,125
+Virus: 2,473,870
+Lake: 536,724
+
+********************Minimun Lenght********************
+Bacteria: 305
+Virus: 200
+Lake: 302*
+*The lake sequence is empty sometimes, we decided to ignore that cases on our code
+
+********************Total Number of Files********************
+Bacteria: 5,242
+Virus: 5,776
+Lake: 1,179,082
