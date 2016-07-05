@@ -123,6 +123,7 @@ def dataController(k_v, k_b, nControlVir, nControlBact, lakeMinLen, lakeMaxLen, 
 
     #creates the specified amount of controlled lake sequences with viral pieces
     for j in range (0, nControlVir):
+        random.seed()
         #get a random virus
         ind = random.randint(1, vLen-1)
         indexes.append(ind)
@@ -131,81 +132,30 @@ def dataController(k_v, k_b, nControlVir, nControlBact, lakeMinLen, lakeMaxLen, 
         virLen = len(vir)
         count = 0
         #tries to find valid random substrings to be used
-        while(True):
-            num1 = random.randint(0, virLen)
-            num2 = num1 + random.randint(lakeMinLen, lakeMaxLen)
-            if num2 > virLen-1:
-                continue
-            else:
-                break
-        if num1 < num2:
-            #controls the max length
-            if(num2 - num1) > lakeMaxLen:
-                num2 = num1 + lakeMaxLen
+        num1 = random.randint(10, virLen)
+        num2 = num1 - random.randint(1, num1)   
+        print("N1:", num1, "N2:", num2)    
 
-            #get a substring
-            strg = vir[num1:num2]
-            controlled_lake.append(strg)
-        elif num2 < num1:
-            #controls the max length
-            if(num1 - num2) > lakeMaxLen:
-                num1 = num2 + lakeMaxLen
-
-            #get a substring
-            strg = vir[num2:num1]
-            controlled_lake.append(strg)
-        else:
-            #controls the max length
-            if(virLen - num2) > lakeMaxLen:
-                num2 += lakeMaxLen
-            else:
-                num2 = virLen-1
-
-            #get a substring
-            strg = vir[num1:num2]
-            controlled_lake.append(strg)
+        #get a substring
+        strg = vir[num2:num1]
+        controlled_lake.append(strg)
 
     #creates the specified amount of controlled lake sequences with bacterial pieces
     for j in range (0, nControlBact):
+        random.seed()
         ind = random.randint(1, bLen-1)
         indexes.append(ind + vLen)
         bact = k_b[ind]
         bactLen = len(bact)
         count = 0
-        while(True):
-            num1 = random.randint(0, bactLen)
-            print(num1, lakeMinLen, lakeMaxLen)
-            num2 = num1 + random.randint(lakeMinLen, lakeMaxLen)
-            if num2 > bactLen-1:
-                continue
-            else:
-                break
-        if num1 < num2:
-            #controls the max length
-            if(num2 - num1) > lakeMaxLen:
-                num2 = num1 + lakeMaxLen
+        #tries to find valid random substrings to be used
+        num1 = random.randint(10, bactLen)
+        num2 = num1 - random.randint(1, num1)    
+        print("N1:", num1, "N2:", num2)   
 
-            #get a substring
-            strg = bact[num1:num2]
-            controlled_lake.append(strg)
-        elif num2 < num1:
-            #controls the max length
-            if(num1 - num2) > lakeMaxLen:
-                num1 = num2 + lakeMaxLen
-
-            #get a substring
-            strg = bact[num2:num1]
-            controlled_lake.append(strg)
-        else:
-            #controls the max length
-            if(virLen - num2) > lakeMaxLen:
-                num2 += lakeMaxLen
-            else:
-                num2 = bactLen-1
-
-            #get a substring
-            strg = bact[num1:num2]
-            controlled_lake.append(strg)
+        #get a substring
+        strg = bact[num2:num1]
+        controlled_lake.append(strg)        
 
     return controlled_lake
 
@@ -223,6 +173,7 @@ def dataController2(k_v, k_b, nControlVir, nControlBact, lakeMinLen, lakeMaxLen,
 
     #creates the specified amount of controlled lake sequences with viral pieces
     for j in range (0, nControlVir):
+        random.seed()
         print(j)
         #get a random virus
         ind = random.randint(1, vLen-1)
@@ -233,43 +184,17 @@ def dataController2(k_v, k_b, nControlVir, nControlBact, lakeMinLen, lakeMaxLen,
         virLen = len(vir)
         count = 0
         #tries to find valid random substrings to be used
-        while(True):
-            num1 = random.randint(0, virLen)
-            num2 = num1 + random.randint(lakeMinLen, lakeMaxLen)
-            print(num2, virLen-1)
-            if num2 > virLen-1:
-                continue
-            else:
-                break
-        if num1 < num2:
-            #controls the max length
-            if(num2 - num1) > lakeMaxLen:
-                num2 = num1 + lakeMaxLen
+        num1 = random.randint(10, virLen)
+        num2 = num1 - random.randint(1, num1)    
+        print("N1:", num1, "N2:", num2)   
 
-            #get a substring
-            strg = vir[num1:num2]
-            controlled_lake.append(strg)
-        elif num2 < num1:
-            #controls the max length
-            if(num1 - num2) > lakeMaxLen:
-                num1 = num2 + lakeMaxLen
-
-            #get a substring
-            strg = vir[num2:num1]
-            controlled_lake.append(strg)
-        else:
-            #controls the max length
-            if(virLen - num2) > lakeMaxLen:
-                num2 += lakeMaxLen
-            else:
-                num2 = virLen-1
-
-            #get a substring
-            strg = vir[num1:num2]
-            controlled_lake.append(strg)
+        #get a substring
+        strg = vir[num2:num1]
+        controlled_lake.append(strg)
 
     #creates the specified amount of controlled lake sequences with bacterial pieces
     for j in range (0, nControlBact):
+        random.seed()
         print(j)
         ind = random.randint(1, bLen-1)
         indexes.append(k_b[ind])
@@ -277,41 +202,15 @@ def dataController2(k_v, k_b, nControlVir, nControlBact, lakeMinLen, lakeMaxLen,
             bact = seq_record.seq
         bactLen = len(bact)
         count = 0
-        while(True):
-            num1 = random.randint(0, bactLen)
-            # print(num1, lakeMinLen, lakeMaxLen)
-            num2 = num1 + random.randint(lakeMinLen, lakeMaxLen)
-            if num2 > bactLen-1:
-                continue
-            else:
-                break
-        if num1 < num2:
-            #controls the max length
-            if(num2 - num1) > lakeMaxLen:
-                num2 = num1 + lakeMaxLen
+        #tries to find valid random substrings to be used
+        num1 = random.randint(10, bactLen)
+        num2 = num1 - random.randint(1, num1)    
+        print("N1:", num1, "N2:", num2)
 
-            #get a substring
-            strg = bact[num1:num2]
-            controlled_lake.append(strg)
-        elif num2 < num1:
-            #controls the max length
-            if(num1 - num2) > lakeMaxLen:
-                num1 = num2 + lakeMaxLen
-
-            #get a substring
-            strg = bact[num2:num1]
-            controlled_lake.append(strg)
-        else:
-            #controls the max length
-            if(virLen - num2) > lakeMaxLen:
-                num2 += lakeMaxLen
-            else:
-                num2 = bactLen-1
-
-            #get a substring
-            strg = bact[num1:num2]
-            controlled_lake.append(strg)
-
+        #get a substring
+        strg = bact[num2:num1]
+        controlled_lake.append(strg)
+        
     return controlled_lake, indexes
 
 def Generate_lake(known_viruses, known_bacterias, nControlVir, nControlBact):
