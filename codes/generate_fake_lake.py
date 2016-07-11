@@ -133,8 +133,7 @@ def dataController(k_v, k_b, nControlVir, nControlBact, lakeMinLen, lakeMaxLen, 
         count = 0
         #tries to find valid random substrings to be used
         num1 = random.randint(10, virLen)
-        num2 = num1 - random.randint(1, num1)   
-        print("N1:", num1, "N2:", num2)    
+        num2 = num1 - random.randint(1, num1)
 
         #get a substring
         strg = vir[num2:num1]
@@ -150,12 +149,11 @@ def dataController(k_v, k_b, nControlVir, nControlBact, lakeMinLen, lakeMaxLen, 
         count = 0
         #tries to find valid random substrings to be used
         num1 = random.randint(10, bactLen)
-        num2 = num1 - random.randint(1, num1)    
-        print("N1:", num1, "N2:", num2)   
+        num2 = num1 - random.randint(1, num1)
 
         #get a substring
         strg = bact[num2:num1]
-        controlled_lake.append(strg)        
+        controlled_lake.append(strg)
 
     return controlled_lake
 
@@ -168,16 +166,18 @@ def dataController(k_v, k_b, nControlVir, nControlBact, lakeMinLen, lakeMaxLen, 
 #error: corruption limit
 def dataController2(k_v, k_b, nControlVir, nControlBact, lakeMinLen, lakeMaxLen, indexes):
     controlled_lake = []
+    ids = []
+
     vLen = len(k_v)
     bLen = len(k_b)
 
     #creates the specified amount of controlled lake sequences with viral pieces
     for j in range (0, nControlVir):
         random.seed()
-        print(j)
         #get a random virus
         ind = random.randint(1, vLen-1)
         indexes.append(k_v[ind])
+        ids.append(ind)
         for seq_record in SeqIO.parse(k_v[ind], "fasta"):
             vir = seq_record.seq
         #get the length of the random virus
@@ -185,8 +185,7 @@ def dataController2(k_v, k_b, nControlVir, nControlBact, lakeMinLen, lakeMaxLen,
         count = 0
         #tries to find valid random substrings to be used
         num1 = random.randint(10, virLen)
-        num2 = num1 - random.randint(1, num1)    
-        print("N1:", num1, "N2:", num2)   
+        num2 = num1 - random.randint(1, num1)
 
         #get a substring
         strg = vir[num2:num1]
@@ -195,28 +194,28 @@ def dataController2(k_v, k_b, nControlVir, nControlBact, lakeMinLen, lakeMaxLen,
     #creates the specified amount of controlled lake sequences with bacterial pieces
     for j in range (0, nControlBact):
         random.seed()
-        print(j)
         ind = random.randint(1, bLen-1)
         indexes.append(k_b[ind])
-        for seq_record in SeqIO.parse(k_v[ind], "fasta"):
+        ids.append(ind + vLen)
+        for seq_record in SeqIO.parse(k_b[ind], "fasta"):
             bact = seq_record.seq
         bactLen = len(bact)
         count = 0
         #tries to find valid random substrings to be used
         num1 = random.randint(10, bactLen)
-        num2 = num1 - random.randint(1, num1)    
-        print("N1:", num1, "N2:", num2)
+        num2 = num1 - random.randint(1, num1)
 
         #get a substring
         strg = bact[num2:num1]
         controlled_lake.append(strg)
-        
-    return controlled_lake, indexes
+
+    return controlled_lake, ids
 
 def Generate_lake(known_viruses, known_bacterias, nControlVir, nControlBact):
     indexes = []
-    lakeMinLen = 500
-    lakeMaxLen = 2000
+    lake_index = []
+    lakeMinLen = 40
+    lakeMaxLen = 100
     # lake = dataController(known_viruses, known_bacterias, nControlVir, nControlBact, lakeMinLen, lakeMaxLen, indexes)
     lake, lake_index = dataController2(known_viruses, known_bacterias, nControlVir, nControlBact, lakeMinLen, lakeMaxLen, indexes)
 
@@ -233,10 +232,13 @@ def Generate_lake(known_viruses, known_bacterias, nControlVir, nControlBact):
 
     fid = open("../database/lake_filenames.txt", 'w+')
     for i in indexes:
-        fid.write(i + '\n')
+        fid.write(str(i) + '\n')
     fid.close()
 
-    return indexes
+    # print(lake_index)
+
+
+    return indexes, lake_index
 
 # ******************************************************* main ****************************************************
 
