@@ -4,17 +4,14 @@ if platform_name == "darwin":
    import sys
    sys.path.append('//anaconda/lib/python3.5/site-packages/')
 
-import random
 from random import choice
 
-import operator
 import os
 import math
-import time
+import itertools
 from string import ascii_uppercase
 
 import numpy as np
-from numpy import trapz
 
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
@@ -23,9 +20,6 @@ from sklearn.decomposition import PCA
 from sklearn.neighbors import KDTree
 
 import generate_fake_lake as fl
-
-%matplotlib inline
-
 
 # ****** functions ********
 
@@ -99,7 +93,6 @@ def FeatureVector(dictionary, sequence, n):
 
 def kdtree(data, lake_matrix, k_neighbors = 10, leaf_size = 20):
     # training
-    # kdtree = KDTree(data, leaf_size=leaf_size, metric='minkowski')
     kdtree = KDTree(data, leaf_size=leaf_size, metric='euclidean')
 
     # testing
@@ -121,29 +114,29 @@ def filenameToMatrix(file):
         l.append(f.replace('\n',''))
     return l
 
+def getIDfromFilename(filename):
+    return os.path.basename(filename)
+
 def process():
     lake_matrix = []
 
-    n = 4; D = CreateDictionary(n)
+    nucleotides = 4; D = CreateDictionary(nucleotides)
     for w in lake:
-        arr = FeatureVector(D, str(w), n)
+        arr = FeatureVector(D, str(w), nucleotides)
         arr = np.divide(np.array(arr), len(w))
         lake_matrix.append(arr)
 
     len_lake = len(lake)
     len_viruses = len(virus_matrix)
 
-    matrix = np.vstack((virus_matrix,bact_matrix))
-    virus_bact_filenames = np.hstack((virus_filenames,bact_filenames))
-
     ###### PCA
     if use_pca:
-        print("performing PCA...")
+        print("Reducing dimensionality from", matrix.shape[1], "to", pca_components, "...")
         X = np.array(matrix)
         # PCA input: samples x features
         pca = PCA(n_components=pca_components)
         Xhat = pca.fit_transform(X)
-        print("Percentage of represented variance: ", sum(pca.explained_variance_ratio_))
+        print("Percentage of represented variance:", sum(pca.explained_variance_ratio_)*100)
 
     ###### CLASSIFICATION
     if use_pca:
@@ -152,56 +145,92 @@ def process():
     else:
         data = np.array(matrix)
 
-    ### choose a classification method
     ## the method will pick the best candidates to perform local alignment in each lake sample
     siz1, siz2 = data.shape
     neighbors = round(perc*siz1)
-    print("running knn with ", neighbors, " neighbors....")
+    print("Running k-NN with", neighbors, "neighbors....")
 
     # classification call
     indices, dist = kdtree(data, lake_matrix, k_neighbors = neighbors, leaf_size = 30)
 
     return indices, dist
 
-# ******************************************************* main ****************************************************
+def saveOutput():
+    fid = open(output_filename, 'w')
+    fid.write(str(len(lake)) + "\n")
+    for i in range(0,len(lake)):
+        fid.write(str(lake[i]) + "\n");
+        fid.write(str(len(indices[i])) + "\n");
+        for j in range(0,len(indices[i])):
+            idx = indices[i][j]
+            fid.write(getIDfromFilename(virus_bact_filenames[idx]) + " ");
+            fid.write(str(dist[i][j]) + " ")
+        fid.write("\n\n")
+    fid.close()
 
-# to use preprocessed bacteria and virus files
+
+# ******************************************************* parameters ****************************************************
+
+# Set here if you want to use precomputed files.
+# If yes, tell in what path the files are.
+# In order to run the precomputed files,
+# you have to run at least once without them.
 use_presaved = True
 presaved_path = "../presaved/"
 
-# if not using presaved, enter here where are the .fasta files
+# If you are not using precomputed files, enter below
+# the name of the folders containing the .fasta files.
 virus_database_path = "../database/virus/"
 bact_database_path = "../database/bact/"
 
+# Enter here the path to the folder with lake files.
+# Below, enter how many lake samples you want to read.
 lake_path = "../database/lake/"
-lake_quantity = 1000
+lake_quantity = 10
 
-# to reduce dimensionality of the data
-use_pca = False
+# Set below the length of nucleotides sequence you want to
+# consider when generating the feature vector
+# Eg.: With 4 nucleotides, each position of the feature vector
+# will count how many subsequences of 4 nucleotides are in the
+# bacteria or virus sequence.
+nucleotides = 4
+
+# Set below if you want to reduce dimensionality of the data.
+# Eg.: if you use 4 nucleotides, the feature vectores will be a
+# 256-position vector. If you want to reduce the number of dimensions
+# of this vector, insert below.
+use_pca = True
 pca_components = 100
 
-# percentage of neighbors to look for
+# Enter the percentage of the total training data number that
+# you want to choose as candidates
 perc = .15
 
+# Insert where you want to save the output file
+output_filename = "teste.txt"
+
+# ******************************************************* main ****************************************************
+
 if use_presaved:
-    virus_matrix = np.loadtxt(presaved_path + "virus_features.txt")
-    bact_matrix = np.loadtxt(presaved_path + "bact_features.txt")
-    virus_filenames = filenameToMatrix(presaved_path + "virus_filenames.txt")
-    bact_filenames = filenameToMatrix(presaved_path + "bact_filenames.txt")
+    print("Reading presaved training data...")
+    virus_matrix = np.loadtxt(presaved_path + "virus_features0.txt")
+    bact_matrix = np.loadtxt(presaved_path + "bact_features0.txt")
+    virus_filenames = filenameToMatrix(presaved_path + "virus_filenames0.txt")
+    bact_filenames = filenameToMatrix(presaved_path + "bact_filenames0.txt")
 else:
-    print("reading data...")
+    print("Reading training data...")
     known_viruses, virus_filenames = ReadDataBaseFilenames(virus_database_path, 0, presaved_path + "virus_filenames.txt")
     known_bacterias, bact_filenames = ReadDataBaseFilenames(bact_database_path, 0, presaved_path + "bact_filenames.txt")
     virus_matrix = []
     bact_matrix = []
     n = 4; D = CreateDictionary(n)
-    print("generating viruses feature vectors...")
+    print("Generating viruses feature vectors...")
     for w in known_viruses:
         arr = FeatureVector(D, str(w), n)
         arr = np.divide(np.array(arr), len(w))
         virus_matrix.append(arr)
     m=0
-    print("generating bacterias feature vectors...")
+    print("Generating bacterias feature vectors...")
     for w in known_bacterias:
         arr = FeatureVector(D, str(w), n)
         arr = np.divide(np.array(arr), len(w))
@@ -214,11 +243,11 @@ else:
     fid2.write(listToString(bact_matrix))
     fid1.close(); fid2.close()
 
+matrix = np.vstack((virus_matrix,bact_matrix))
+virus_bact_filenames = np.hstack((virus_filenames,bact_filenames))
 
-print("reading lake...")
+print("Reading lake files...")
 lake, lake_filenames = ReadDataBaseFilenames(lake_path, lake_quantity, presaved_path + "lake_filenames.txt")
-print(np.array(lake).shape)
-
 indices, dist = process()
 
-print("finished")
+saveOutput()
