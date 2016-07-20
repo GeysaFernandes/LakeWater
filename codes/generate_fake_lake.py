@@ -184,14 +184,15 @@ def dataController2(k_v, k_b, nControlVir, nControlBact, lakeMinLen, lakeMaxLen,
         virLen = len(vir)
         count = 0
         #tries to find valid random substrings to be used
-        num1 = random.randint(10, virLen)
-        num2 = num1 - random.randint(1, num1)
+        size = random.randint(lakeMinLen, min(lakeMaxLen,virLen))
+        begin = random.randint(size, virLen) - size
+
 
         #get a substring
-        strg = vir[num2:num1]
+        strg = vir[begin:begin+size]
         controlled_lake.append(strg)
 
-    #creates the specified amount of controlled lake sequences with bacterial pieces
+    #creates the specified amount of ascontrolled lake sequences with bacterial pieces
     for j in range (0, nControlBact):
         random.seed()
         ind = random.randint(1, bLen-1)
@@ -202,11 +203,11 @@ def dataController2(k_v, k_b, nControlVir, nControlBact, lakeMinLen, lakeMaxLen,
         bactLen = len(bact)
         count = 0
         #tries to find valid random substrings to be used
-        num1 = random.randint(10, bactLen)
-        num2 = num1 - random.randint(1, num1)
+        size = random.randint(lakeMinLen, min(lakeMaxLen,bactLen))
+        begin = random.randint(size, bactLen) - size
 
         #get a substring
-        strg = bact[num2:num1]
+        strg = bact[begin:begin+size]
         controlled_lake.append(strg)
 
     return controlled_lake, ids
@@ -215,7 +216,7 @@ def Generate_lake(known_viruses, known_bacterias, nControlVir, nControlBact):
     indexes = []
     lake_index = []
     lakeMinLen = 40
-    lakeMaxLen = 100
+    lakeMaxLen = 1000
     # lake = dataController(known_viruses, known_bacterias, nControlVir, nControlBact, lakeMinLen, lakeMaxLen, indexes)
     lake, lake_index = dataController2(known_viruses, known_bacterias, nControlVir, nControlBact, lakeMinLen, lakeMaxLen, indexes)
 
