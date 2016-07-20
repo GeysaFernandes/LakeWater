@@ -25,7 +25,7 @@ import generate_fake_lake as fl
 
 #read n .fna database files in the specified path
 #set n = 0 to read all files
-def ReadDataBaseFilenames(_path, n, filename_filename):
+def ReadDataBaseFilenames(_path, n, filename_filename, extension):
     seqList = []
     filenameList = []
     from os import path
@@ -35,7 +35,7 @@ def ReadDataBaseFilenames(_path, n, filename_filename):
     if '.DS_Store' in files:
         files.remove('.DS_Store')
     for f in files:
-        for seq_record in SeqIO.parse(_path + f, "fasta"):
+        for seq_record in SeqIO.parse(_path + f, extension):
             s = seq_record.seq
             seqList.append(s) # reads each file into a list
             filenameList.append(_path + f)
@@ -182,11 +182,14 @@ presaved_path = "../presaved/"
 # the name of the folders containing the .fasta files.
 virus_database_path = "../database/virus/"
 bact_database_path = "../database/bact/"
+virus_extension = "fasta"
+bact_extension = "fasta"
 
 # Enter here the path to the folder with lake files.
 # Below, enter how many lake samples you want to read.
-lake_path = "../database/lake/"
-lake_quantity = 10
+lake_path = "../database/fake_lake/"
+lake_extension = "fastq"
+lake_quantity = 1240
 
 # Set below the length of nucleotides sequence you want to
 # consider when generating the feature vector
@@ -199,7 +202,7 @@ nucleotides = 4
 # Eg.: if you use 4 nucleotides, the feature vectores will be a
 # 256-position vector. If you want to reduce the number of dimensions
 # of this vector, insert below.
-use_pca = True
+use_pca = False
 pca_components = 100
 
 # Enter the percentage of the total training data number that
@@ -219,8 +222,8 @@ if use_presaved:
     bact_filenames = filenameToMatrix(presaved_path + "bact_filenames0.txt")
 else:
     print("Reading training data...")
-    known_viruses, virus_filenames = ReadDataBaseFilenames(virus_database_path, 0, presaved_path + "virus_filenames.txt")
-    known_bacterias, bact_filenames = ReadDataBaseFilenames(bact_database_path, 0, presaved_path + "bact_filenames.txt")
+    known_viruses, virus_filenames = ReadDataBaseFilenames(virus_database_path, 0, presaved_path + "virus_filenames.txt", extension = virus_extension)
+    known_bacterias, bact_filenames = ReadDataBaseFilenames(bact_database_path, 0, presaved_path + "bact_filenames.txt", extension = bact_extension)
     virus_matrix = []
     bact_matrix = []
     n = 4; D = CreateDictionary(n)
@@ -247,7 +250,8 @@ matrix = np.vstack((virus_matrix,bact_matrix))
 virus_bact_filenames = np.hstack((virus_filenames,bact_filenames))
 
 print("Reading lake files...")
-lake, lake_filenames = ReadDataBaseFilenames(lake_path, lake_quantity, presaved_path + "lake_filenames.txt")
+lake, lake_filenames = ReadDataBaseFilenames(lake_path, lake_quantity, presaved_path + "lake_filenames.txt", extension = lake_extension)
+print("Read", len(lake), "file samples")
 indices, dist = process()
 
 saveOutput()
