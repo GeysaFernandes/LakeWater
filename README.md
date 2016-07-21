@@ -8,11 +8,9 @@ One of the most popular tools to match sequences is called string alignment, a m
 We measured our accuracy based on [Dr. Catherine Putonti sample collection from Lake Michigan] (http://www.publish.csiro.au/paper/MF15172.htm).
 
 ## Methods
-###Main Methods
+###Main methods
 <dl>
-  <dt>1. Clustering</dt>
-  <dd>We hoped to group similar microorganisms in the same group by using clustering.</dd>
-  <dt>2. k-d Tree</dt>
+  <dt>1. k-d Tree</dt>
   <dd>k-d Tree is the standard method to find the nearest neighbors.</dd>
 </dl>
 ###Supportive methods
