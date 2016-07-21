@@ -9,16 +9,26 @@ We measured our accuracy based on [Dr. Catherine Putonti sample collection from 
 
 ## Methods
 ###Main methods
-<dl>
-  <dt>1. k-d Tree</dt>
-  <dd>k-d Tree is the standard method to find the nearest neighbors.</dd>
-</dl>
-###Supportive methods
-<dl>
-  <dt>1. Feature Vector</dt>
-  <dd>The feature vector is a score vector for all possible combinations of the nucleobases arranged in groups of k bases. Advised by Dr. Putonti we arrange the nucleotides by 3, 4 or 6.</dd>
-  <dt>2. PCA - Principal Component Analysis</dt>
-  <dd>We used PCA as a dimensionality reduction method</dd>
-<dl/>
 
-## How to run
+1. k-d Tree: k-d Tree is the standard method to find the nearest neighbors.
+
+###Supportive methods
+
+1. Feature Vector: The feature vector is a score vector for all possible combinations of the nucleobases arranged in groups of k bases. Advised by Dr. Putonti we arrange the nucleotides by 3, 4 or 6.
+2. PCA - Principal Component Analysis: We used PCA as a dimensionality reduction method
+
+## Files
+### lake_water_accuracy_test.ipynb
+This is the script that tests out method. Since we had only real data without groundtruth, we created a simulated case test.
+For our test, we extracted subsequences of known viruses and bacterias and considered them as lakes. A right answer of our code is when the original virus or bacteria sequence is among the candidates.
+
+#### How to run
+For this one, you have to have:
+
+1. [Python 3.5](https://www.python.org/downloads/)
+2. [Jupyter notebook](http://jupyter.readthedocs.io/en/latest/install.html)
+3. [BioPython](http://biopython.org/wiki/Download)
+4. [SciKit Learn](http://scikit-learn.org/stable/)
+
+
+
