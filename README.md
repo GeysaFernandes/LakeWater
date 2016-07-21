@@ -10,12 +10,19 @@ We measured our accuracy based on [Dr. Catherine Putonti sample collection from 
 ## Methods
 ###Main methods
 
-1. k-d Tree: k-d Tree is the standard method to find the nearest neighbors.
+1. k-d Tree
+
+    • is the standard method to find the nearest neighbors.
 
 ###Supportive methods
 
-1. Feature Vector: The feature vector is a score vector for all possible combinations of the nucleobases arranged in groups of k bases. Advised by Dr. Putonti we arrange the nucleotides by 3, 4 or 6.
-2. PCA - Principal Component Analysis: We used PCA as a dimensionality reduction method
+1. Feature Vector 
+
+    • The feature vector is a score vector for all possible combinations of the nucleobases arranged in groups of k bases. Advised by Dr. Putonti we arrange the nucleotides by 3, 4 or 6.
+
+2. PCA - Principal Component Analysis
+
+    • We used PCA as a dimensionality reduction method
 
 ## Files
 ### lake_water_accuracy_test.ipynb
@@ -30,5 +37,10 @@ For this one, you have to have:
 3. [BioPython](http://biopython.org/wiki/Download)
 4. [SciKit Learn](http://scikit-learn.org/stable/)
 
-
-
+### alignment_candidates.py
+For this one, you will the same things from above but Jupyter notebook.
+The parameters for the code are specified in the code.
+To run, you just have to type the following snipped on Terminal/prompt:
+```
+$ python alignment_candidates.py
+```
