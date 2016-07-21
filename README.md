@@ -36,11 +36,27 @@ For this one, you have to have:
 2. [Jupyter notebook](http://jupyter.readthedocs.io/en/latest/install.html)
 3. [BioPython](http://biopython.org/wiki/Download)
 4. [SciKit Learn](http://scikit-learn.org/stable/)
+5. [NumPy](http://www.numpy.org)
+
+Then you just have to hit the "run" button in Jupyter notebook and wait for the output to be generated.
+
+#### Output
+
+The output for this code is a graph. The X-axis of the graph represents the amount of nearest neighbors that we are picking.
+More specifically, this X-axis is the percentage of the training data that we are using as the final number of candidates.
+The y-axis shows the odds of the original virus or bacteria sequence of the synthetic lake samples being among the candidates.
+
+We can see from the graph generated that if we perform alignment over only 15% of all database, we can still get 95% accuracy.
 
 ### alignment_candidates.py
+This is the script that will select the candidates for your lake database. Inside the code you can set the path to the
+databases, and the number of candidates you want to select, etc.
+
+#### How to run
 For this one, you will the same things from above but Jupyter notebook.
 The parameters for the code are specified in the code.
 To run, you just have to type the following snipped on Terminal/prompt:
 ```
 $ python alignment_candidates.py
 ```
+#### Output
