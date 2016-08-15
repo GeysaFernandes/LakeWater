@@ -9,6 +9,7 @@ from random import choice
 import os
 import math
 import itertools
+import time
 from string import ascii_uppercase
 
 import numpy as np
@@ -25,11 +26,15 @@ import generate_fake_lake as fl
 
 #read n .fna database files in the specified path
 #set n = 0 to read all files
-def ReadDataBaseFilenames(_path, n, filename_filename, extension):
+def ReadDataBaseFilenames(_path, n, filename_filename, species_filename, extension):
     seqList = []
     filenameList = []
+    idList = []
+    speciesList = []
+
     from os import path
     files = os.listdir(_path) #makes a list of all files in folder
+
     i = 0
     j = 0
     if '.DS_Store' in files:
@@ -39,6 +44,13 @@ def ReadDataBaseFilenames(_path, n, filename_filename, extension):
             s = seq_record.seq
             seqList.append(s) # reads each file into a list
             filenameList.append(_path + f)
+            idList.append(seq_record.id)
+
+            desc = seq_record.description
+            desc = desc.split('|')[-1]  # get the last entry
+            desc = desc.split(',')[0]
+            speciesList.append(desc)
+
             j += 1
             if(n > 0):
                 if(j > n-1):
@@ -55,7 +67,15 @@ def ReadDataBaseFilenames(_path, n, filename_filename, extension):
     for f in filenameList:
         fid.write(f + '\n')
     fid.close()
-    return seqList, filenameList
+
+    fid1 = open(species_filename, 'w')
+    for f in speciesList:
+        fid1.write(f + '\n')
+    fid1.close()
+
+
+
+    return seqList, filenameList, idList, speciesList
 
 
 #creates dictionary with all permutations of length n
@@ -115,7 +135,7 @@ def filenameToMatrix(file):
     return l
 
 def getIDfromFilename(filename):
-    return os.path.basename(filename)
+    return os.path.basename(filename).split('.')[0]
 
 def process():
     lake_matrix = []
@@ -156,17 +176,25 @@ def process():
     return indices, dist
 
 def saveOutput():
-    fid = open(output_filename, 'w')
-    fid.write(str(len(lake)) + "\n")
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
     for i in range(0,len(lake)):
-        fid.write(str(lake[i]) + "\n");
-        fid.write(str(len(indices[i])) + "\n");
+        curr = time.strftime("%d-%m-%Y--%H-%M-%S")
+        fid = open(output_folder + curr + "--" + str(i), 'w+')
+
         for j in range(0,len(indices[i])):
             idx = indices[i][j]
-            fid.write(getIDfromFilename(virus_bact_filenames[idx]) + " ");
-            fid.write(str(dist[i][j]) + " ")
-        fid.write("\n\n")
-    fid.close()
+            idx_str = getIDfromFilename(virus_bact_filenames[idx])
+            spec = virus_bact_species[idx]
+            line = ""
+            line += ">[" + lake_ids[i] + "]"
+            line += idx_str + "|" + spec + "|" + str(dist[i][j]) + "|"
+            line += str(len(lake)) + "|" + str(len(indices[i]))
+            fid.write(line + "\n")
+            fid.write(str(lake[i]))
+            fid.write("\n")
+        fid.close()
 
 
 # ******************************************************* parameters ****************************************************
@@ -187,9 +215,9 @@ bact_extension = "fasta"
 
 # Enter here the path to the folder with lake files.
 # Below, enter how many lake samples you want to read.
-lake_path = "../database/fake_lake/"
+lake_path = "../database/lake/"
 lake_extension = "fastq"
-lake_quantity = 1240
+lake_quantity = 5
 
 # Set below the length of nucleotides sequence you want to
 # consider when generating the feature vector
@@ -207,23 +235,25 @@ pca_components = 100
 
 # Enter the percentage of the total training data number that
 # you want to choose as candidates
-perc = .15
+perc = .02
 
-# Insert where you want to save the output file
-output_filename = "teste.txt"
+# Insert where you want to save the output files
+output_folder = "../output/test0/"
 
 # ******************************************************* main ****************************************************
 
 if use_presaved:
     print("Reading presaved training data...")
-    virus_matrix = np.loadtxt(presaved_path + "virus_features0.txt")
-    bact_matrix = np.loadtxt(presaved_path + "bact_features0.txt")
-    virus_filenames = filenameToMatrix(presaved_path + "virus_filenames0.txt")
-    bact_filenames = filenameToMatrix(presaved_path + "bact_filenames0.txt")
+    virus_matrix = np.loadtxt(presaved_path + "virus_features.txt")
+    bact_matrix = np.loadtxt(presaved_path + "bact_features.txt")
+    virus_filenames = filenameToMatrix(presaved_path + "virus_filenames.txt")
+    bact_filenames = filenameToMatrix(presaved_path + "bact_filenames.txt")
+    virus_species = filenameToMatrix(presaved_path + "virus_filenames.txt")
+    bact_species = filenameToMatrix(presaved_path + "bact_filenames.txt")
 else:
     print("Reading training data...")
-    known_viruses, virus_filenames = ReadDataBaseFilenames(virus_database_path, 0, presaved_path + "virus_filenames.txt", extension = virus_extension)
-    known_bacterias, bact_filenames = ReadDataBaseFilenames(bact_database_path, 0, presaved_path + "bact_filenames.txt", extension = bact_extension)
+    known_viruses, virus_filenames, virus_ids, virus_species = ReadDataBaseFilenames(virus_database_path, 0, presaved_path + "virus_filenames.txt", "virus_species.txt", virus_extension)
+    known_bacterias, bact_filenames, bact_ids, bact_species = ReadDataBaseFilenames(bact_database_path, 0, presaved_path + "bact_filenames.txt", "bact_species.txt", bact_extension)
     virus_matrix = []
     bact_matrix = []
     n = 4; D = CreateDictionary(n)
@@ -248,9 +278,10 @@ else:
 
 matrix = np.vstack((virus_matrix,bact_matrix))
 virus_bact_filenames = np.hstack((virus_filenames,bact_filenames))
+virus_bact_species = np.hstack((virus_species,bact_species))
 
 print("Reading lake files...")
-lake, lake_filenames = ReadDataBaseFilenames(lake_path, lake_quantity, presaved_path + "lake_filenames.txt", extension = lake_extension)
+lake, lake_filenames, lake_ids, lake_species = ReadDataBaseFilenames(lake_path, lake_quantity, presaved_path + "lake_filenames.txt", "lake_species.txt", lake_extension)
 print("Read", len(lake), "file samples")
 indices, dist = process()
 

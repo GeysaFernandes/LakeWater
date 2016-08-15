@@ -217,29 +217,29 @@ def Generate_lake(known_viruses, known_bacterias, nControlVir, nControlBact):
     lake_index = []
     lakeMinLen = 40
     lakeMaxLen = 1000
-    # lake = dataController(known_viruses, known_bacterias, nControlVir, nControlBact, lakeMinLen, lakeMaxLen, indexes)
     lake, lake_index = dataController2(known_viruses, known_bacterias, nControlVir, nControlBact, lakeMinLen, lakeMaxLen, indexes)
 
-    #save in file
-    fd = open("../database/lake.txt", "w+")
-    llen = len(lake)
-    fd.write(str(nControlVir)+'\n')
-    fd.write(str(nControlBact)+'\n')
-    for i in range(0, llen):
-        if(i > 0):
-            fd.write('\n')
-        fd.write(str(lake[i]))
-    fd.close()
+    lake = [nControlVir] + [nControlBact] + lake
 
-    fid = open("../database/lake_filenames.txt", 'w+')
-    for i in indexes:
-        fid.write(str(i) + '\n')
-    fid.close()
+    # #save in file
+    # fd = open("../database/lake.txt", "w+")
+    # llen = len(lake)
+    # fd.write(str(nControlVir)+'\n')
+    # fd.write(str(nControlBact)+'\n')
+    # for i in range(0, llen):
+    #     if(i > 0):
+    #         fd.write('\n')
+    #     fd.write(str(lake[i]))
+    # fd.close()
+    #
+    # fid = open("../database/lake_filenames.txt", 'w+')
+    # for i in indexes:
+    #     fid.write(str(i) + '\n')
+    # fid.close()
 
     # print(lake_index)
 
-
-    return indexes, lake_index
+    return lake, indexes, lake_index
 
 # ******************************************************* main ****************************************************
 
